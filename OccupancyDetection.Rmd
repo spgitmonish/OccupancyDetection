@@ -1,0 +1,34 @@
+```{r, warning = FALSE}
+library(ggplot2)
+```
+
+## Summarize Data 
+```{r, warning = FALSE}
+# Load the training data
+trainingset <- read.csv("datatraining.txt", header = TRUE)
+
+# Load the two sets of testing data
+testset1 <- read.csv("datatest.txt", header = TRUE)
+testset2 <- read.csv("datatest2.txt", header = TRUE)
+
+# Look at the dimensions of the training data
+dim(trainingset)
+
+# Look at the class of each variable
+sapply(trainingset, class)
+
+# Convert the Occupancy variable into a factor
+trainingset$Occupancy <- as.factor(trainingset$Occupancy)
+testset1$Occupancy <- as.factor(testset1$Occupancy)
+testset2$Occupancy <- as.factor(testset2$Occupancy)
+
+# Get a summary of the data
+summary(trainingset)
+```
+After looking at the distribution of occupancy, it looks like the occupancy is majority '0'. So 
+the data is skewed, this is where k-fold testing becomes very crucial
+
+## Visualize Data
+```{r, warning=FALSE}
+
+```
