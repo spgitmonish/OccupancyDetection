@@ -1,5 +1,6 @@
 ```{r, warning = FALSE}
 library(ggplot2)
+library(caret)
 ```
 
 ## Summarize Data 
@@ -22,6 +23,11 @@ trainingset$Occupancy <- as.factor(trainingset$Occupancy)
 testset1$Occupancy <- as.factor(testset1$Occupancy)
 testset2$Occupancy <- as.factor(testset2$Occupancy)
 
+# Strip the date and use only time
+trainingset$date <- format(strptime(trainingset$date, "%Y-%m-%d %H:%M:%S"), "%H:%M:%S")
+testset1$date <- format(strptime(testset1$date, "%Y-%m-%d %H:%M:%S"), "%H:%M:%S")
+testset2$date <- format(strptime(testset2$date, "%Y-%m-%d %H:%M:%S"), "%H:%M:%S")
+
 # Get a summary of the data
 summary(trainingset)
 ```
@@ -30,5 +36,28 @@ the data is skewed, this is where k-fold testing becomes very crucial
 
 ## Visualize Data
 ```{r, warning=FALSE}
+# Box plots of all the numeric variables
+par(mfrow=c(1,5))
+for(i in 2:6) {
+  boxplot(trainingset[, i], main = names(trainingset)[i])
+}
 
+# Have free scales and not limited to a certain range
+scales <- list(x = list(relation = "free"), y = list(relation = "free"))
+
+# Scatter plots of all the numeric independent variables seperated by class
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "ellipse", 
+            auto.key = list(columns = 2))
+
+# Box and Whisker plots for each attribute seperated by class
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "box", scales = scales)
+
+# Density plots for each attribute by class value
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "density", 
+            scales = scales, auto.key = list(columns = 2))
 ```
+From the plots above, especially with the density plots the following things can be noticed:
+1. Light might be the biggest factor in terms of whether a room is occupied or not
+2. CO2 levels when the room is not occupied is very high and low when occupied
+3. There is a overlap in the distribution of the temperature curves when the room is occupied
+   v/s when it is not. Although the chances that a room is occupied is higher with higher temperature
