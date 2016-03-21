@@ -1,5 +1,6 @@
 ```{r, warning = FALSE}
 library(ggplot2)
+library(caret)
 ```
 
 ## Summarize Data 
@@ -22,13 +23,35 @@ trainingset$Occupancy <- as.factor(trainingset$Occupancy)
 testset1$Occupancy <- as.factor(testset1$Occupancy)
 testset2$Occupancy <- as.factor(testset2$Occupancy)
 
+# Strip the date and use only time
+trainingset$date <- format(strptime(trainingset$date, "%Y-%m-%d %H:%M:%S"), 
+                           "%H:%M:%S")
+testset1$date <- format(strptime(testset1$date, "%Y-%m-%d %H:%M:%S"), "%H:%M:%S")
+testset2$date <- format(strptime(testset2$date, "%Y-%m-%d %H:%M:%S"), "%H:%M:%S")
+
 # Get a summary of the data
 summary(trainingset)
+
+# Look at the distribution of the class variable
+cbind(freq = table(trainingset$Occupancy),
+      percentage = prop.table(table(trainingset$Occupancy)) * 100)
 ```
-After looking at the distribution of occupancy, it looks like the occupancy is majority '0'. So 
-the data is skewed, this is where k-fold testing becomes very crucial
+After looking at the distribution of the class variable "Occupancy". It's skewed
+in favor of '0' or not occupied. 
 
 ## Visualize Data
 ```{r, warning=FALSE}
+# Seperate the dependent and independent variables
+# Box plots for each of the numeric variables(date not included)
+par(mfrow = c(1,5))
+for(i in 2:6){
+  boxplot(trainingset[, i], main=names(trainingset)[i])
+}
 
+# Scatter matrix of the numeric variables seperated by class
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "ellipse")
+
+# Density plots for each attribute by class value
+scales <- list(x = list(relation = "free"), y = list(relation = "free"))
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "density", scales = scales)
 ```
