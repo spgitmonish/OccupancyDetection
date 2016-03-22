@@ -41,17 +41,57 @@ in favor of '0' or not occupied.
 
 ## Visualize Data
 ```{r, warning=FALSE}
-# Seperate the dependent and independent variables
-# Box plots for each of the numeric variables(date not included)
-par(mfrow = c(1,5))
-for(i in 2:6){
-  boxplot(trainingset[, i], main=names(trainingset)[i])
+# Box plots of all the numeric variables
+par(mfrow=c(1,5))
+for(i in 2:6) {
+  boxplot(trainingset[, i], main = names(trainingset)[i])
 }
 
-# Scatter matrix of the numeric variables seperated by class
-featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "ellipse")
+# Have free scales and not limited to a certain range
+scales <- list(x = list(relation = "free"), y = list(relation = "free"))
+
+# Scatter plots of all the numeric independent variables seperated by class
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "ellipse", 
+            auto.key = list(columns = 2))
+
+# Box and Whisker plots for each attribute seperated by class
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "box", scales = scales)
 
 # Density plots for each attribute by class value
-scales <- list(x = list(relation = "free"), y = list(relation = "free"))
-featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "density", scales = scales)
+featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "density", 
+            scales = scales, auto.key = list(columns = 2))
+```
+From the plots above, especially with the density plots the following things can be noticed:
+1. Light might be the biggest factor in terms of whether a room is occupied or not
+2. CO2 levels when the room is not occupied is very high and low when occupied
+3. There is a overlap in the distribution of the temperature curves when the room is occupied
+   v/s when it is not. Although the chances that a room is occupied is higher with higher temperature
+   
+## Evaluate algorithms
+```{r, warning=FALSE}
+# Split the data set for 10-fold cross validation, train on 9, test on 1 for all combinations
+trainControl <- trainControl(method = "cv", number = 10)
+metric <- "Accuracy"
+
+# Evaluate 5 different algorithms, make sure the same seed is used
+# LDA
+set.seed(7)
+fit.lda <- train(Occupancy~., data = trainingset, method = "lda", 
+                 metric = metric, trControl = trainControl)
+# CART
+set.seed(7)
+fit.cart <- train(Occupancy~., data = trainingset, method = "rpart", 
+                  metric = metric, trControl = trainControl)
+# kNN
+set.seed(7)
+fit.knn <- train(Occupancy~., data = trainingset, method = "knn", 
+                 metric = metric, trControl = trainControl)
+# SVM
+set.seed(7)
+fit.svm <- train(Occupancy~., data = trainingset, method = "svmRadial", 
+                 metric = metric, trControl = trainControl)
+# Random Forest
+set.seed(7)
+fit.rf <- train(Occupancy~., data = trainingset, method = "rf",
+                metric = metric, trControl = trainControl)
 ```
