@@ -61,3 +61,32 @@ From the plots above, especially with the density plots the following things can
 2. CO2 levels when the room is not occupied is very high and low when occupied
 3. There is a overlap in the distribution of the temperature curves when the room is occupied
    v/s when it is not. Although the chances that a room is occupied is higher with higher temperature
+   
+## Evaluate algorithms
+```{r, warning=FALSE}
+# Split the data set for 10-fold cross validation, train on 9, test on 1 for all combinations
+trainControl <- trainControl(method = "cv", number = 10)
+metric <- "Accuracy"
+
+# Evaluate 5 different algorithms, make sure the same seed is used
+# LDA
+set.seed(7)
+fit.lda <- train(Occupancy~., data = trainingset, method = "lda", 
+                 metric = metric, trControl = trainControl)
+# CART
+set.seed(7)
+fit.cart <- train(Occupancy~., data = trainingset, method = "rpart", 
+                  metric = metric, trControl = trainControl)
+# kNN
+set.seed(7)
+fit.knn <- train(Occupancy~., data = trainingset, method = "knn", 
+                 metric = metric, trControl = trainControl)
+# SVM
+set.seed(7)
+fit.svm <- train(Occupancy~., data = trainingset, method = "svmRadial", 
+                 metric = metric, trControl = trainControl)
+# Random Forest
+set.seed(7)
+fit.rf <- train(Occupancy~., data = trainingset, method = "rf",
+                metric = metric, trControl = trainControl)
+```
