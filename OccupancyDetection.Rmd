@@ -90,8 +90,26 @@ fit.knn <- train(Occupancy~., data = trainingset, method = "knn",
 set.seed(7)
 fit.svm <- train(Occupancy~., data = trainingset, method = "svmRadial", 
                  metric = metric, trControl = trainControl)
-# Random Forest
-set.seed(7)
-fit.rf <- train(Occupancy~., data = trainingset, method = "rf",
-                metric = metric, trControl = trainControl)
+
+# Summarize accuracy of models
+results <- resamples(list(lda = fit.lda, cart = fit.cart, knn = fit.knn, svm = fit.svm))
+summary(results)
+
+# Dot plot of the results
+dotplot(results)
 ```
+From the results, CART and kNN are very close in terms of accuracy and kappa, with CART only slightly better. Let's pick CART as the final algorithm.
+
+## Finalize algorithm
+```{r, warning=FALSE}
+# Summary of the algorithm
+print(fit.cart)
+
+# Estimate on the test set(1 & 2)
+predictions1 <- predict(fit.cart, testset1)
+confusionMatrix(predictions1, testset1$Occupancy)
+
+predictions2 <- predict(fit.cart, testset2)
+confusionMatrix(predictions2, testset2$Occupancy)
+```
+From running the algorithm on the test data, the accuracy is pretty good 95%+ but the Kappa drops a little compared to the Training data. 
