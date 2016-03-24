@@ -24,10 +24,13 @@ testset1$Occupancy <- as.factor(testset1$Occupancy)
 testset2$Occupancy <- as.factor(testset2$Occupancy)
 
 # Strip the date and use only time
-trainingset$date <- format(strptime(trainingset$date, "%Y-%m-%d %H:%M:%S"), 
-                           "%H:%M:%S")
-testset1$date <- format(strptime(testset1$date, "%Y-%m-%d %H:%M:%S"), "%H:%M:%S")
-testset2$date <- format(strptime(testset2$date, "%Y-%m-%d %H:%M:%S"), "%H:%M:%S")
+trainingset$date <- format(strptime(trainingset$date, "%Y-%m-%d %H:%M:%S"), "%d %H:%M:%S")
+testset1$date <- format(strptime(testset1$date, "%Y-%m-%d %H:%M:%S"), "%d %H:%M:%S")
+testset2$date <- format(strptime(testset2$date, "%Y-%m-%d %H:%M:%S"), "%d %H:%M:%S")
+
+trainingset$date <- strptime(trainingset$date, "%d %H:%M:%S")
+testset1$date <- strptime(testset1$date, "%d %H:%M:%S")
+testset2$date <- strptime(testset2$date, "%d %H:%M:%S")
 
 # Get a summary of the data
 summary(trainingset)
@@ -60,6 +63,22 @@ featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "box", scales =
 # Density plots for each attribute by class value
 featurePlot(x = trainingset[, 2:6], y = trainingset[, 7], plot = "density", 
             scales = scales, auto.key = list(columns = 2))
+
+# Variation of different numeric variables based on the time 
+ggplot(trainingset, aes(date, Temperature)) + geom_line() +
+  scale_x_datetime(date_labels = "%d %H:%M:%S", date_breaks = "6 hour")
+
+ggplot(trainingset, aes(date, CO2)) + geom_line() +
+  scale_x_datetime(date_labels = "%d %H:%M:%S", date_breaks = "6 hour") 
+
+ggplot(trainingset, aes(date, Light)) + geom_line() +
+  scale_x_datetime(date_labels = "%d %H:%M:%S", date_breaks = "6 hour") 
+
+ggplot(trainingset, aes(date, Humidity)) + geom_line() +
+  scale_x_datetime(date_labels = "%d %H:%M:%S", date_breaks = "6 hour") 
+
+ggplot(trainingset, aes(date, HumidityRatio)) + geom_line() +
+  scale_x_datetime(date_labels = "%d %H:%M:%S", date_breaks = "6 hour") 
 ```
 From the plots above, especially with the density plots the following things can be noticed:
 1. Light might be the biggest factor in terms of whether a room is occupied or not
